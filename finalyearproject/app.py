@@ -5,7 +5,7 @@ import os
 app = Flask(__name__)
 
 # Set your API key here
-YOUTUBE_API_KEY = os.getenv("AIzaSyBFU5iPIjMOaLae5fm53A06eZyu4aJebPA") or "AIzaSyBFU5iPIjMOaLae5fm53A06eZyu4aJebPA"
+YOUTUBE_API_KEY = os.getenv("YoutubeAPIkey") or "YoutubeAPIkey"
 
 def fetch_backing_track(song_title):
     youtube = build("youtube", "v3", developerKey=YOUTUBE_API_KEY)
