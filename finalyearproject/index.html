@@ -1,0 +1,111 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <title>MusicaX</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+  <link rel="stylesheet" href="assets/css/main.css" />
+  <noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+  <style>
+    html {
+      scroll-behavior: smooth;
+    }
+  </style>
+</head>
+<body class="is-preload">
+
+<!-- Header -->
+<header id="header">
+  <div class="content">
+    <h1><a href="#">MusicaX</a></h1>
+    <p>Turn every lyric into music<br />
+      explore chords, tabs, and solos in one click.</p>
+    <ul class="actions">
+      <li><a href="#one" class="button primary icon solid fa-chevron-down">Try It</a></li>
+      <li><a href="#one" class="button icon solid fa-chevron-down">Learn More</a></li>
+    </ul>
+  </div>
+  <div class="image phone">
+    <div class="inner"><img src="/images/guitarimage.jpg" alt="" /></div>
+  </div>
+</header>
+
+<br><br><br>
+
+<main>
+  <section id="one">
+    <div class="input-container" style="text-align:center;">
+      <input class="input" name="text" type="text" id="songInput" placeholder="Search and rock..." style="width: 60%; padding: 12px; font-size: 16px;" />
+      <br><br>
+      <button onclick="searchSong()" class="button primary">Search</button>
+    </div>
+  </section>
+
+  <div id="results" style="margin-top: 40px; text-align: center;"></div>
+</main>
+
+<!-- Footer -->
+<footer id="footer">
+  <ul class="icons">
+    <li><a href="#" class="icon brands fa-facebook-f"><span class="label">Facebook</span></a></li>
+    <li><a href="#" class="icon brands fa-twitter"><span class="label">Twitter</span></a></li>
+    <li><a href="#" class="icon brands fa-instagram"><span class="label">Instagram</span></a></li>
+  </ul>
+  <p class="copyright">&copy; Untitled. Credits: <a href="http://html5up.net">Subhodeep</a></p>
+</footer>
+
+<!-- Scripts -->
+<script src="assets/js/jquery.min.js"></script>
+<script src="assets/js/jquery.scrolly.min.js"></script>
+<script src="assets/js/browser.min.js"></script>
+<script src="assets/js/breakpoints.min.js"></script>
+<script src="assets/js/util.js"></script>
+<script src="assets/js/main.js"></script>
+<script src="assets/js/smooth-scroll.js"></script>
+
+<!-- Backend integration script -->
+<script>
+  async function searchSong() {
+    const song = document.getElementById('songInput').value.trim();
+    if (!song) {
+      alert("Please enter a song name.");
+      return;
+    }
+
+    const resultsDiv = document.getElementById('results');
+    resultsDiv.innerHTML = "Loading...";
+
+    try {
+      const response = await fetch(`http://localhost:5000/search?song=${encodeURIComponent(song)}`);
+      const data = await response.json();
+      resultsDiv.innerHTML = ""; // Clear loading
+
+      if (data.backing_track?.url) {
+        resultsDiv.innerHTML += `
+          <h2>Backing Track: ${data.backing_track.title}</h2>
+          <iframe width="560" height="315" src="${data.backing_track.embed}" frameborder="0" allowfullscreen></iframe>
+          <br><br>
+        `;
+      } else {
+        resultsDiv.innerHTML += `<p>No backing track found.</p>`;
+      }
+
+      if (data.tabs && data.tabs.length > 0) {
+        resultsDiv.innerHTML += `<h3>Guitar Tabs:</h3><pre style="text-align:left; display:inline-block;">${data.tabs.join('\n')}</pre>`;
+      }
+
+      if (data.lyrics_chords && data.lyrics_chords.length > 0) {
+        resultsDiv.innerHTML += "<h3>Lyrics with Chords:</h3>";
+        data.lyrics_chords.forEach(item => {
+          resultsDiv.innerHTML += `<p><strong>${item.chords_above}</strong><br>${item.line}</p>`;
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      resultsDiv.innerHTML = "<p style='color:red;'>Something went wrong while fetching the song. Please try again later.</p>";
+    }
+  }
+</script>
+
+</body>
+</html>
